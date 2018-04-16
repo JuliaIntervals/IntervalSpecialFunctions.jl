@@ -1,0 +1,5 @@
+module IntervalSpecialFunctions
+
+# package code goes here
+
+end # module
