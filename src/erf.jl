@@ -81,7 +81,7 @@ function erfcinv(a::Interval{BigFloat})
     a = a ∩ domain
 
     isempty(a) && return a
-    hull(erfcinv(a.lo), erfcinv(a.hi))
+    hull(erfcinv(a.hi), erfcinv(a.lo))
 end
 
 function erfcinv(a::Interval{Float64})
@@ -89,5 +89,5 @@ function erfcinv(a::Interval{Float64})
     a = a ∩ domain
 
     isempty(a) && return a
-    hull(_erfcinv(a.lo), _erfcinv(a.hi))
+    hull(_erfcinv(a.hi), _erfcinv(a.lo))
 end
