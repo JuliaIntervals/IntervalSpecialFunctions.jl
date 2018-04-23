@@ -20,18 +20,74 @@ function erfc(a::Interval{T}) where T
     @round( erfc(a.hi), erfc(a.lo) )
 end
 
-function erfinv(a::Interval{T}) where T
-    domain = Interval{T}(-1, 1)
-    a = a ∩ domain
+function _erfinv(a::Float64)
+    domain = -1..1
+    a ∉ domain && return DomainError("$a is not in [-1, 1]")
+    rts = roots(x -> erf(x) - a, -Inf..Inf,
+        Newton(x->2/sqrt(pi_interval(Float64)) * exp(-x^2)))
+    @assert length(rts) == 1 && rts[1].status == :unique
 
-    isempty(a) && return a
-    roots(x -> erf(x) - a, domain, Newton(x->2/√(pi_interval(T)) * exp(-x^2)))
+    rts[1].interval
 end
 
-function erfcinv(a::Interval{T}) where T
-    domain = Interval{T}(0, 2)
+function erfinv(a::BigFloat)
+    domain = Interval{BigFloat}(-1, 1)
+    a ∉ domain && return DomainError("$a is not in [-1, 1]")
+    rts = roots(x -> erf(x) - a, Interval{BigFloat}(-Inf, Inf),
+        Newton(x->2/sqrt(pi_interval(BigFloat)) * exp(-x^2)))
+    @assert length(rts) == 1 && rts[1].status == :unique
+
+    rts[1].interval
+end
+
+function erfinv(a::Interval{BigFloat})
+    domain = Interval{BigFloat}(-1, 1)
     a = a ∩ domain
 
     isempty(a) && return a
-    roots(x -> erfc(x) - a, domain, Newton(x->-2/√(pi_interval(T)) * exp(-x^2)))
+    hull(erfinv(a.lo), erfinv(a.hi))
+end
+
+function erfinv(a::Interval{Float64})
+    domain = Interval{Float64}(-1, 1)
+    a = a ∩ domain
+
+    isempty(a) && return a
+    hull(_erfinv(a.lo), _erfinv(a.hi))
+end
+
+function _erfcinv(a::Float64)
+    domain = 0..2
+    a ∉ domain && return DomainError("$a is not in [-1, 1]")
+    rts = roots(x -> erfc(x) - a, -Inf..Inf,
+        Newton(x->-2/sqrt(pi_interval(Float64)) * exp(-x^2)))
+    @assert length(rts) == 1 && rts[1].status == :unique
+
+    rts[1].interval
+end
+
+function erfcinv(a::BigFloat)
+    domain = Interval{BigFloat}(0, 2)
+    a ∉ domain && return DomainError("$a is not in [-1, 1]")
+    rts = roots(x -> erfc(x) - a, Interval{BigFloat}(-Inf, Inf),
+        Newton(x->-2/sqrt(pi_interval(BigFloat)) * exp(-x^2)))
+    @assert length(rts) == 1 && rts[1].status == :unique
+
+    rts[1].interval
+end
+
+function erfcinv(a::Interval{BigFloat})
+    domain = Interval{BigFloat}(0, 2)
+    a = a ∩ domain
+
+    isempty(a) && return a
+    hull(erfcinv(a.lo), erfcinv(a.hi))
+end
+
+function erfcinv(a::Interval{Float64})
+    domain = Interval{Float64}(0, 2)
+    a = a ∩ domain
+
+    isempty(a) && return a
+    hull(_erfcinv(a.lo), _erfcinv(a.hi))
 end
