@@ -21,4 +21,11 @@ setprecision(Interval, Float64)
         @test erfc(0..0) == Interval(1.0, 1.0)
         @test erfc(@biginterval(-1, 1)) ⊆ Interval(1.5729920705028511e-01, 1.842700792949715)
     end
+
+    @testset "erfinv" begin
+        @test erfinv(emptyinterval()) == emptyinterval()
+        @test erfinv(0..0.99) == Interval(0, 1.8213863677184554)
+        @test erfinv(0..1//2) == Interval(0, 0.4769362762044699)
+        @test erfinv(@biginterval(0, 0)) == @biginterval(0, 0)
+    end
 end

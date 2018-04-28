@@ -20,74 +20,40 @@ function erfc(a::Interval{T}) where T
     @round( erfc(a.hi), erfc(a.lo) )
 end
 
-function _erfinv(a::Float64)
-    domain = -1..1
-    a ∉ domain && return DomainError("$a is not in [-1, 1]")
-    rts = roots(x -> erf(x) - a, -Inf..Inf,
-        Newton(x->2/sqrt(pi_interval(Float64)) * exp(-x^2)))
-    @assert length(rts) == 1 && rts[1].status == :unique
-
-    rts[1].interval
-end
-
 function erfinv(a::BigFloat)
     domain = Interval{BigFloat}(-1, 1)
     a ∉ domain && return DomainError("$a is not in [-1, 1]")
-    rts = roots(x -> erf(x) - a, Interval{BigFloat}(-Inf, Inf),
-        Newton(x->2/sqrt(pi_interval(BigFloat)) * exp(-x^2)))
+    f = x -> erf(x) - a
+    fp = x->2/sqrt(pi_interval(BigFloat)) * exp(-x^2)
+    rts = roots(f, Interval{BigFloat}(-Inf, Inf), Newton(f, fp))
     @assert length(rts) == 1 && rts[1].status == :unique
 
-    rts[1].interval
+    mid(rts[1].interval)
 end
 
-function erfinv(a::Interval{BigFloat})
-    domain = Interval{BigFloat}(-1, 1)
+function erfinv(a::Interval{T}) where T
+    domain = Interval{T}(-1, 1)
     a = a ∩ domain
 
     isempty(a) && return a
-    hull(erfinv(a.lo), erfinv(a.hi))
-end
-
-function erfinv(a::Interval{Float64})
-    domain = Interval{Float64}(-1, 1)
-    a = a ∩ domain
-
-    isempty(a) && return a
-    hull(_erfinv(a.lo), _erfinv(a.hi))
-end
-
-function _erfcinv(a::Float64)
-    domain = 0..2
-    a ∉ domain && return DomainError("$a is not in [-1, 1]")
-    rts = roots(x -> erfc(x) - a, -Inf..Inf,
-        Newton(x->-2/sqrt(pi_interval(Float64)) * exp(-x^2)))
-    @assert length(rts) == 1 && rts[1].status == :unique
-
-    rts[1].interval
+    Interval{T}(erfinv(a.lo), erfinv(a.hi))
 end
 
 function erfcinv(a::BigFloat)
     domain = Interval{BigFloat}(0, 2)
-    a ∉ domain && return DomainError("$a is not in [-1, 1]")
-    rts = roots(x -> erfc(x) - a, Interval{BigFloat}(-Inf, Inf),
-        Newton(x->-2/sqrt(pi_interval(BigFloat)) * exp(-x^2)))
+    a ∉ domain && return DomainError("$a is not in [0, 2]")
+    f = x -> erfc(x) - a
+    fp = x -> -2/sqrt(pi_interval(BigFloat)) * exp(-x^2)
+    rts = roots(f, Interval{BigFloat}(-Inf, Inf), Newton(f, fp))
     @assert length(rts) == 1 && rts[1].status == :unique
 
     rts[1].interval
 end
 
-function erfcinv(a::Interval{BigFloat})
-    domain = Interval{BigFloat}(0, 2)
+function ercfinv(a::Interval{T}) where T
+    domain = Interval{T}(0, 2)
     a = a ∩ domain
 
     isempty(a) && return a
-    hull(erfcinv(a.hi), erfcinv(a.lo))
-end
-
-function erfcinv(a::Interval{Float64})
-    domain = Interval{Float64}(0, 2)
-    a = a ∩ domain
-
-    isempty(a) && return a
-    hull(_erfcinv(a.hi), _erfcinv(a.lo))
+    Interval{T}(erfinv(a.hi), erfinv(a.lo))
 end
