@@ -20,15 +20,27 @@ function erfc(a::Interval{T}) where T
     @round( erfc(a.hi), erfc(a.lo) )
 end
 
-function erfinv(a::BigFloat)
-    domain = Interval{BigFloat}(-1, 1)
+for f in (:erfinv, :erfcinv)
+
+    @eval function($f)(x::BigFloat, r::RoundingMode)
+        setrounding(BigFloat, r) do
+            ($f)(x)
+        end
+    end
+end
+
+erfinv(a::BigFloat) = mid(_erfinv(a))
+erfcinv(a::BigFloat) = mid(_erfcinv(a))
+
+function _erfinv(a::T) where T
+    domain = Interval{T}(-1, 1)
     a ∉ domain && return DomainError("$a is not in [-1, 1]")
     f = x -> erf(x) - a
-    fp = x->2/sqrt(pi_interval(BigFloat)) * exp(-x^2)
-    rts = roots(f, Interval{BigFloat}(-Inf, Inf), Newton(f, fp))
-    @assert length(rts) == 1 && rts[1].status == :unique
+    fp = x->2/sqrt(pi_interval(T)) * exp(-x^2)
+    rts = roots(f, Interval{T}(-Inf, Inf), deriv=fp)
+    @assert length(rts) == 1 # && rts[1].status == :unique
 
-    mid(rts[1].interval)
+    rts[1].interval
 end
 
 function erfinv(a::Interval{T}) where T
@@ -36,24 +48,24 @@ function erfinv(a::Interval{T}) where T
     a = a ∩ domain
 
     isempty(a) && return a
-    Interval{T}(erfinv(a.lo), erfinv(a.hi))
+    hull(_erfinv(a.lo), _erfinv(a.hi))
 end
 
-function erfcinv(a::BigFloat)
-    domain = Interval{BigFloat}(0, 2)
+function _erfcinv(a::T) where T
+    domain = Interval{T}(0, 2)
     a ∉ domain && return DomainError("$a is not in [0, 2]")
     f = x -> erfc(x) - a
-    fp = x -> -2/sqrt(pi_interval(BigFloat)) * exp(-x^2)
-    rts = roots(f, Interval{BigFloat}(-Inf, Inf), Newton(f, fp))
-    @assert length(rts) == 1 && rts[1].status == :unique
+    fp = x -> -2/sqrt(pi_interval(T)) * exp(-x^2)
+    rts = roots(f, Interval{T}(-Inf, Inf), deriv=fp)
+    @assert length(rts) == 1 # && rts[1].status == :unique
 
     rts[1].interval
 end
 
-function ercfinv(a::Interval{T}) where T
+function erfcinv(a::Interval{T}) where T
     domain = Interval{T}(0, 2)
     a = a ∩ domain
 
     isempty(a) && return a
-    Interval{T}(erfinv(a.hi), erfinv(a.lo))
+    hull(_erfcinv(a.hi), _erfcinv(a.lo))
 end
