@@ -26,19 +26,19 @@ setprecision(Interval, Float64)
         @test erfinv(emptyinterval()) == emptyinterval()
         @test erfinv(0..0.99) == Interval(0, 1.8213863677184523)
         @test erfinv(-1/2..0).lo == -erfinv(0..1/2).hi
-        @test erfinv(@interval(0.3)) == Interval(0.27246271472675426, 0.27246271472675443)
+        @test erfinv(@interval(0.3)) == Interval(0.2724627147267543, 0.27246271472675443)
         @test erfinv(@biginterval(0)) == @biginterval(0)
         @test erfinv(@biginterval(-0.9, 0.9)) ⊆ @biginterval(-1.163087153676674086822064803420789256616, 1.163087153676674086822064803420789256616)
-        @test erfinv(@biginterval(-0.7, 0)).lo == -erfinv(@biginterval(0, 0.7)).hi
+        @test erfinv(@biginterval(-0.7, 0)).lo + erfinv(@biginterval(0, 0.7)).hi < 1e-30
     end
 
     @testset "erfcinv" begin
         @test erfcinv(emptyinterval()) == emptyinterval()
-        @test erfcinv(1..3/2) == Interval(-0.4769362762044702, 0)
+        @test erfcinv(1..3/2) == Interval(-0.4769362762044699, 0)
         @test erfcinv(0.5..1).hi == -erfcinv(1..1.5).lo
-        @test erfcinv(@interval(1.3)) == Interval(-0.2724627147267548, -0.2724627147267538)
-        @test erfcinv(@biginterval(0)) == @biginterval(0)
+        @test erfcinv(@interval(1.3)) == Interval(-0.27246271472675443, -0.27246271472675415)
+        @test erfcinv(@biginterval(1)) == @biginterval(0)
         @test erfcinv(@biginterval(0.9,1.5)) ⊆ @biginterval(-4.769362762044701744959127406367747537799e-01, 8.885599049425768701573729667265248050096e-02)
-        @test erfcinv(@biginterval(0.7, 1)).hi == -erfcinv(@biginterval(1, 1.3)).lo
+        @test erfcinv(@biginterval(0.7, 1)).hi + erfcinv(@biginterval(1, 1.3)).lo < 1e-30
     end
 end
