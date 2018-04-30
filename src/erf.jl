@@ -20,14 +20,10 @@ function erfc(a::Interval{T}) where T
     @round( erfc(a.hi), erfc(a.lo) )
 end
 
-for f in (:erfinv, :erfcinv)
-
-    @eval function($f)(x::BigFloat, r::RoundingMode)
-        setrounding(BigFloat, r) do
-            ($f)(x)
-        end
-    end
-end
+erfinv(x, r::RoundingMode{:Down}) = _erfinv(x).lo
+erfinv(x, r::RoundingMode{:Up}) = _erfinv(x).hi
+erfcinv(x, r::RoundingMode{:Down}) = _erfcinv(x).hi
+erfcinv(x, r::RoundingMode{:Up}) = _erfcinv(x).lo
 
 erfinv(a::BigFloat) = mid(_erfinv(a))
 erfcinv(a::BigFloat) = mid(_erfcinv(a))
@@ -48,7 +44,7 @@ function erfinv(a::Interval{T}) where T
     a = a ∩ domain
 
     isempty(a) && return a
-    hull(_erfinv(a.lo), _erfinv(a.hi))
+    @round(erfinv(a.lo), erfinv(a.hi))
 end
 
 function _erfcinv(a::T) where T
@@ -67,5 +63,5 @@ function erfcinv(a::Interval{T}) where T
     a = a ∩ domain
 
     isempty(a) && return a
-    hull(_erfcinv(a.hi), _erfcinv(a.lo))
+    @round(erfcinv(a.hi), erfcinv(a.lo))
 end

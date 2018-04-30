@@ -34,9 +34,9 @@ setprecision(Interval, Float64)
 
     @testset "erfcinv" begin
         @test erfcinv(emptyinterval()) == emptyinterval()
-        @test erfcinv(1..3/2) == Interval(-0.4769362762044699, 0)
+        @test erfcinv(1..3/2) == Interval(-0.4769362762044698, 0)
         @test erfcinv(0.5..1).hi == -erfcinv(1..1.5).lo
-        @test erfcinv(@interval(1.3)) == Interval(-0.27246271472675443, -0.27246271472675415)
+        @test erfcinv(@interval(1.3)) == Interval(-0.2724627147267544, -0.2724627147267542)
         @test erfcinv(@biginterval(1)) == @biginterval(0)
         @test erfcinv(@biginterval(0.9,1.5)) ⊆ @biginterval(-4.769362762044701744959127406367747537799e-01, 8.885599049425768701573729667265248050096e-02)
         @test erfcinv(@biginterval(0.7, 1)).hi + erfcinv(@biginterval(1, 1.3)).lo < 1e-30
