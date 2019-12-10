@@ -1,0 +1,21 @@
+name = "IntervalSpecialFunctions"
+uuid = "7c3a2fe1-cab2-49c9-b234-1aadb4ee5448"
+repo = "https://github.com/JuliaIntervals/IntervalSpecialFunctions.jl"
+version = "0.1.0"
+
+[deps]
+IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
+IntervalRootFinding = "d2bf35a9-74e0-55ec-b149-d360ff49b807"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[compat]
+IntervalArithmetic = "0.16"
+IntervalRootFinding = "0.5"
+SpecialFunctions = "0.8, 0.9"
+julia = "1.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

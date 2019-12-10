@@ -1,6 +1,7 @@
 using IntervalSpecialFunctions
 using IntervalArithmetic
-using Base.Test
+using SpecialFunctions: erf, erfc, erfcinv, erfinv
+using Test
 
 setprecision(Interval, 128)
 setprecision(Interval, Float64)
