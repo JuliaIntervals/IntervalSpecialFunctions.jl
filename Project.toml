@@ -1,0 +1,13 @@
+name = "IntervalSpecialFunctions"
+uuid = "7ff88eeb-d064-430c-ae4b-ff82c741288f"
+version = "0.1.0"
+
+[deps]
+ArbNumerics = "7e558dbc-694d-5a72-987c-6f4ebed21442"
+IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
+IntervalRootFinding = "d2bf35a9-74e0-55ec-b149-d360ff49b807"
+SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.4"
